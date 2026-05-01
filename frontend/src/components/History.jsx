@@ -114,25 +114,33 @@ export default function History({ onReuse }) {
           <div
             key={item._id}
             onClick={() => onReuse(item)}
-            className="p-3 rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-gold-500 hover:bg-gold-500/5 cursor-pointer transition-all"
+            className="p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-zinc-700 
+      hover:border-gold-500 hover:bg-gold-500/5 cursor-pointer transition-all"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              {/* Main content */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2">
                 <span className="text-lg">
                   {currencyFlags[item.from] || "💱"}
                 </span>
-                <span className="font-mono font-bold text-gray-800 dark:text-white">
+
+                <span className="font-mono font-bold text-gray-800 dark:text-white text-sm sm:text-base">
                   {item.amount}
                 </span>
+
                 <span className="text-gray-400">→</span>
+
                 <span className="text-lg">
                   {currencyFlags[item.to] || "💱"}
                 </span>
-                <span className="font-mono font-bold text-gold-500">
+
+                <span className="font-mono font-bold text-gold-500 text-sm sm:text-base">
                   {item.convertedAmount.toLocaleString()}
                 </span>
               </div>
-              <span className="text-xs text-gray-400">
+
+              {/* Date */}
+              <span className="text-xs text-gray-400 sm:text-right">
                 {new Date(item.createdAt).toLocaleDateString()}
               </span>
             </div>

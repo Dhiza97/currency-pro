@@ -29,7 +29,6 @@ export default function Register() {
 
       const { data } = await API.post("/auth/register", form);
 
-      // Store user object with token at top level
       login({ ...data.user, token: data.token });
       toast.success("Account created!");
       navigate("/");
@@ -41,74 +40,103 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0f] flex items-center justify-center p-4">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0f] flex items-center justify-center p-4 sm:p-6">
+
+      {/* Background blobs (hidden on mobile for cleaner UI) */}
+      <div className="absolute inset-0 overflow-hidden hidden sm:block">
+        <div className="absolute -top-40 -right-40 w-72 sm:w-80 h-72 sm:h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-72 sm:w-80 h-72 sm:h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative w-full max-w-md">
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center p-4 bg-gold-500/10 rounded-2xl mb-4">
-            <BsCurrencyExchange className="text-gold-500 text-4xl" />
+      <div className="relative w-full max-w-sm sm:max-w-md">
+
+        {/* Header */}
+        <div className="text-center mb-6 sm:mb-8 animate-fade-in">
+
+          <div className="inline-flex items-center justify-center p-3 sm:p-4 bg-gold-500/10 rounded-2xl mb-3 sm:mb-4">
+            <BsCurrencyExchange className="text-gold-500 text-3xl sm:text-4xl" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white tracking-wider">
+
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 dark:text-white tracking-wider">
             CURRENCY<span className="text-gold-500">PRO</span>
           </h1>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">Professional Currency Exchange</p>
+
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-500 dark:text-gray-400">
+            Professional Currency Exchange
+          </p>
         </div>
 
-        <div className="card p-8 animate-slide-up">
-          <div className="flex items-center gap-2 mb-6">
-            <BsCalculator className="text-gold-500" />
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white tracking-wider">
+        {/* Card */}
+        <div className="card p-5 sm:p-8 animate-slide-up">
+
+          <div className="flex items-center gap-2 mb-5 sm:mb-6">
+            <BsCalculator className="text-gold-500 text-lg sm:text-base" />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white tracking-wider">
               CREATE ACCOUNT
             </h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+
+            {/* Name */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">Name</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">
+                Name
+              </label>
               <input
-                className="input"
+                className="input text-sm sm:text-base py-3"
                 placeholder="Enter your name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
 
+            {/* Email */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">Email</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">
+                Email
+              </label>
               <input
                 type="email"
-                className="input"
+                className="input text-sm sm:text-base py-3"
                 placeholder="Enter your email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
 
+            {/* Password */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">Password</label>
+              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">
+                Password
+              </label>
               <input
                 type="password"
-                className="input"
+                className="input text-sm sm:text-base py-3"
                 placeholder="Create a password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
             </div>
 
+            {/* Button */}
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full flex items-center justify-center gap-2"
+              className="btn-primary w-full flex items-center justify-center gap-2 py-3"
             >
-              {loading ? <span className="animate-pulse">CREATING...</span> : "REGISTER"}
+              {loading ? (
+                <span className="animate-pulse text-sm sm:text-base">
+                  CREATING...
+                </span>
+              ) : (
+                <span className="text-sm sm:text-base">REGISTER</span>
+              )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          {/* Footer */}
+          <p className="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             Already have an account?{" "}
             <Link to="/" className="text-gold-500 font-semibold hover:underline">
               Login

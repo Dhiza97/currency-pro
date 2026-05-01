@@ -37,7 +37,6 @@ export default function RateChart({ from, to }) {
 
         const incoming = res?.data?.data || [];
 
-        // Normalize + clean data
         const cleaned = incoming
           .filter((item) => item && item.rate)
           .map((item) => ({
@@ -59,7 +58,6 @@ export default function RateChart({ from, to }) {
 
     fetchData();
 
-    // LIVE UPDATES ONLY FOR 1D
     if (range === "1D") {
       interval = setInterval(async () => {
         try {
@@ -73,15 +71,11 @@ export default function RateChart({ from, to }) {
 
           if (!rate) return;
 
-          const newPoint = {
-            time: new Date().toLocaleTimeString(),
-            rate,
-          };
-
           setData((prev) => {
-            const updated = [...prev, newPoint];
-
-            // Keep last 50 points
+            const updated = [
+              ...prev,
+              { time: new Date().toLocaleTimeString(), rate },
+            ];
             return updated.slice(-50);
           });
         } catch (err) {
@@ -96,19 +90,17 @@ export default function RateChart({ from, to }) {
   }, [from, to, range]);
 
   return (
-    <div className="mt-6">
-      {/* Loading */}
-      {loading && (
-        <p className="text-xs text-gray-400 mb-2">Updating...</p>
-      )}
+    <div className="mt-6 w-full">
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm text-gray-500">
+      {/* Header (RESPONSIVE FIX) */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+
+        <h4 className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
           Live Rate Trend ({from} → {to})
         </h4>
 
-        <div className="flex gap-2">
+        {/* Range buttons */}
+        <div className="flex justify-center sm:justify-end gap-2 flex-wrap">
           {["1D", "7D", "1M"].map((r) => (
             <button
               key={r}
@@ -125,77 +117,89 @@ export default function RateChart({ from, to }) {
         </div>
       </div>
 
+      {/* Loading */}
+      {loading && (
+        <p className="text-xs text-gray-400 mb-2 text-center sm:text-left">
+          Updating...
+        </p>
+      )}
+
       {/* Empty State */}
       {data.length === 0 && !loading && (
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-400 text-center sm:text-left">
           No data available for this range
         </p>
       )}
 
-      {/* Chart */}
-      <ResponsiveContainer width="100%" height={220}>
-        <LineChart
-          data={data}
-          onMouseMove={(e) => {
-            if (e && e.activeLabel) {
-              setHoverX(e.activeLabel);
-            }
-          }}
-          onMouseLeave={() => setHoverX(null)}
-        >
-          {/* Gradient */}
-          <defs>
-            <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
-            </linearGradient>
-          </defs>
+      {/* Chart wrapper */}
+      <div className="w-full overflow-x-hidden">
 
-          {/* Grid */}
-          <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-
-          {/* Axes */}
-          <XAxis dataKey="time" />
-          <YAxis domain={["auto", "auto"]} />
-
-          {/* Tooltip */}
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "#111",
-              border: "none",
-              borderRadius: "8px",
-              color: "#fff",
+        <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 180 : 240}>
+          <LineChart
+            data={data}
+            onMouseMove={(e) => {
+              if (e && e.activeLabel) setHoverX(e.activeLabel);
             }}
-          />
+            onMouseLeave={() => setHoverX(null)}
+          >
+            <defs>
+              <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
+              </linearGradient>
+            </defs>
 
-          {/* Crosshair */}
-          {hoverX && (
-            <ReferenceLine
-              x={hoverX}
-              stroke="#888"
-              strokeDasharray="3 3"
+            <CartesianGrid strokeDasharray="3 3" opacity={0.08} />
+
+            {/* X-axis: responsive label handling */}
+            <XAxis
+              dataKey="time"
+              tick={{ fontSize: 10 }}
+              interval="preserveStartEnd"
+              minTickGap={20}
             />
-          )}
 
-          {/* Area */}
-          <Area
-            type="monotone"
-            dataKey="rate"
-            stroke="none"
-            fill="url(#colorRate)"
-          />
+            <YAxis
+              tick={{ fontSize: 10 }}
+              width={40}
+              domain={["auto", "auto"]}
+            />
 
-          {/* Line */}
-          <Line
-            type="monotone"
-            dataKey="rate"
-            stroke="#D4AF37"
-            strokeWidth={2}
-            dot={false}
-            isAnimationActive={true}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#111",
+                border: "none",
+                borderRadius: "8px",
+                color: "#fff",
+                fontSize: "12px",
+              }}
+            />
+
+            {hoverX && (
+              <ReferenceLine
+                x={hoverX}
+                stroke="#888"
+                strokeDasharray="3 3"
+              />
+            )}
+
+            <Area
+              type="monotone"
+              dataKey="rate"
+              stroke="none"
+              fill="url(#colorRate)"
+            />
+
+            <Line
+              type="monotone"
+              dataKey="rate"
+              stroke="#D4AF37"
+              strokeWidth={2}
+              dot={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

@@ -110,6 +110,7 @@ export default function SavedPairs({ onSelectPair }) {
   return (
     <div className="card p-6">
       <div className="flex items-center gap-2 mb-4">
+        <BsStar className="text-gold-500" />
         <h3 className="font-semibold text-gray-800 dark:text-white tracking-wider">
           FAVORITES
         </h3>
@@ -125,31 +126,38 @@ export default function SavedPairs({ onSelectPair }) {
         {pairs.map((pair) => (
           <div
             key={pair._id}
-            className="p-3 rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-gold-500 hover:bg-gold-500/5 transition-all group"
+            className="p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-zinc-700 
+      hover:border-gold-500 hover:bg-gold-500/5 transition-all"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
+              {/* Select pair button */}
               <button
                 onClick={() => onSelectPair(pair)}
-                className="flex items-center gap-2 cursor-pointer"
+                className="flex flex-wrap items-center gap-2 text-left"
               >
                 <span className="text-lg">
                   {currencyFlags[pair.from] || "💱"}
                 </span>
-                <span className="font-mono font-bold text-gray-800 dark:text-white">
+
+                <span className="font-mono font-bold text-gray-800 dark:text-white text-sm sm:text-base">
                   {pair.from}
                 </span>
+
                 <span className="text-gray-400">→</span>
+
                 <span className="text-lg">
                   {currencyFlags[pair.to] || "💱"}
                 </span>
-                <span className="font-mono font-bold text-gray-800 dark:text-white">
+
+                <span className="font-mono font-bold text-gray-800 dark:text-white text-sm sm:text-base">
                   {pair.to}
                 </span>
               </button>
 
+              {/* Delete button (always visible on mobile) */}
               <button
                 onClick={() => handleDelete(pair.from, pair.to)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
               >
                 <BsTrash />
               </button>
