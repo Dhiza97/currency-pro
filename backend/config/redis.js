@@ -5,9 +5,7 @@ let isConnected = false;
 
 export const initRedis = async () => {
   try {
-    client = new Redis({
-      host: 'localhost',
-      port: 6379,
+    client = new Redis(process.env.REDIS_URL, {
       retryStrategy: (times) => {
         if (times > 3) {
           console.log('Redis: Max retries reached, using fallback');
@@ -23,7 +21,7 @@ export const initRedis = async () => {
     });
 
     client.on('connect', () => {
-      console.log('✅ Redis connected');
+      console.log('Redis connected');
       isConnected = true;
     });
 
@@ -31,9 +29,7 @@ export const initRedis = async () => {
       isConnected = true;
     });
 
-    // Test connection
     await client.ping();
-    isConnected = true;
   } catch (error) {
     console.error('Redis connection failed:', error.message);
     console.log('⚠️ Using in-memory cache fallback');
