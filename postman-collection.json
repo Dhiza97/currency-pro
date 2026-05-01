@@ -1,0 +1,284 @@
+{
+  "info": {
+    "name": "Currency Converter API",
+    "description": "API documentation for Currency Converter application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/profile",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/auth/profile",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Save Currency Pair",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/pairs",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from\": \"USD\",\n  \"to\": \"EUR\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Saved Pairs",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/pairs",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Delete Saved Pair",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/auth/pairs?pairId=YOUR_PAIR_ID",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conversion",
+      "item": [
+        {
+          "name": "Convert Currency",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/convert?from=USD&to=NGN&amount=100",
+              "host": ["{{baseUrl}}"],
+              "path": ["convert"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "USD"
+                },
+                {
+                  "key": "to",
+                  "value": "NGN"
+                },
+                {
+                  "key": "amount",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Convert with Saved Pair",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/convert/pair?pairId=YOUR_PAIR_ID&amount=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["convert", "pair"],
+              "query": [
+                {
+                  "key": "pairId",
+                  "value": "YOUR_PAIR_ID"
+                },
+                {
+                  "key": "amount",
+                  "value": "50"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Rate History (1D)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/convert/rates/history?from=USD&to=NGN&range=1d",
+              "host": ["{{baseUrl}}"],
+              "path": ["convert", "rates", "history"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "USD"
+                },
+                {
+                  "key": "to",
+                  "value": "NGN"
+                },
+                {
+                  "key": "range",
+                  "value": "1d"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Rate History (7D)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/convert/rates/history?from=USD&to=NGN&range=7d",
+              "host": ["{{baseUrl}}"],
+              "path": ["convert", "rates", "history"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "USD"
+                },
+                {
+                  "key": "to",
+                  "value": "NGN"
+                },
+                {
+                  "key": "range",
+                  "value": "7d"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Rate History (1M)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/convert/rates/history?from=USD&to=NGN&range=1m",
+              "host": ["{{baseUrl}}"],
+              "path": ["convert", "rates", "history"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "USD"
+                },
+                {
+                  "key": "to",
+                  "value": "NGN"
+                },
+                {
+                  "key": "range",
+                  "value": "1m"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Conversion History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/convert/history",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
