@@ -14,7 +14,7 @@ export default function Converter({ selectedPair, reuseData }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     from: "USD",
-    to: "NGN",
+    to: "EUR",
     amount: "",
   });
 
