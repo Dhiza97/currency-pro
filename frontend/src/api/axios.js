@@ -2,82 +2,61 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  withCredentials: true, // send the httpOnly refresh cookie
 });
 
-// Attach token automatically to every request
+// Attach access token from context to every request
+// (Set via setAccessTokenGetter below from AuthContext)
+let _getToken = () => null;
+let _refresh  = () => null;
+
+export const setAuthHandlers = (getToken, refresh) => {
+  _getToken = getToken;
+  _refresh  = refresh;
+};
+
 API.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  if (user?.token) {
-    config.headers.Authorization = `Bearer ${user.token}`;
-  }
-
+  const token = _getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
+let isRefreshing = false;
+let queue = [];
+
+API.interceptors.response.use(
+  (res) => res,
+  async (err) => {
+    const original = err.config;
+    if (err.response?.status === 401 && !original._retry) {
+      if (isRefreshing) {
+        // Queue requests while refresh is in flight
+        return new Promise((resolve, reject) => {
+          queue.push({ resolve, reject });
+        }).then((token) => {
+          original.headers.Authorization = `Bearer ${token}`;
+          return API(original);
+        });
+      }
+
+      original._retry = true;
+      isRefreshing = true;
+
+      const newToken = await _refresh();
+      isRefreshing = false;
+
+      if (newToken) {
+        queue.forEach(({ resolve }) => resolve(newToken));
+        queue = [];
+        original.headers.Authorization = `Bearer ${newToken}`;
+        return API(original);
+      } else {
+        queue.forEach(({ reject }) => reject(err));
+        queue = [];
+      }
+    }
+    return Promise.reject(err);
+  }
+);
+
 export default API;
-
-
-
-
-// import axios from "axios";
-
-// const API = axios.create({
-//     baseURL: 'http://localhost:5000/api'
-// })
-
-// // Fix corrupted localStorage
-// const storedUser = localStorage.getItem("user");
-// if (storedUser === "undefined" || !storedUser) {
-//     localStorage.removeItem("user");
-// }
-
-// // Attach token automatically
-// API.interceptors.request.use((req) => {
-//     const userStr = localStorage.getItem("user")
-    
-//     if (userStr && userStr !== "undefined") {
-//         try {
-//             const user = JSON.parse(userStr)
-//             if(user?.token) {
-//                 req.headers.Authorization = `Bearer ${user.token}`
-//             }
-//         } catch (e) {
-//             // Invalid JSON, ignore
-//         }
-//     }
-
-//     return req
-// })
-
-// // Handle non-JSON error responses
-// API.interceptors.response.use(
-//     (response) => response,
-//     (error) => {
-//         if (error.response) {
-//             // Server responded with error status
-//             const status = error.response.status;
-//             let message = "An error occurred";
-            
-//             if (error.response.data?.message) {
-//                 message = error.response.data.message;
-//             } else if (status === 401) {
-//                 message = "Unauthorized";
-//             } else if (status === 404) {
-//                 message = "Not found";
-//             } else if (status === 500) {
-//                 message = "Server error";
-//             }
-            
-//             // Create a proper error object
-//             return Promise.reject({
-//                 response: {
-//                     data: { message }
-//                 }
-//             });
-//         }
-//         return Promise.reject(error);
-//     }
-// )
-
-// export default API

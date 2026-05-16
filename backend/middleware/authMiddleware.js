@@ -3,41 +3,33 @@ import User from "../models/User.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const protect = asyncHandler(async (req, res, next) => {
-  let token;
+  const authHeader = req.headers.authorization;
 
-  if (req.headers.authorization?.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      req.user = await User.findById(decoded.id).select("-password");
-
-      next();
-    } catch (error) {
-      res.status(401);
-      throw new Error("Not authorized");
-    }
-  }
-
-  if (!token) {
+  if (!authHeader?.startsWith("Bearer ")) {
     res.status(401);
     throw new Error("No token provided");
   }
-});
 
-export const optionalProtect = asyncHandler(async (req, res, next) => {
-  let token;
+  const token = authHeader.split(" ")[1];
 
-  if (req.headers.authorization?.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    res.status(401);
+    throw new Error(err.name === "TokenExpiredError" ? "Token expired" : "Invalid token");
+  }
 
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
-    } catch (error) {
-      req.user = null;
-    }
+  // Reject refresh tokens used as access tokens
+  if (decoded.type !== "access") {
+    res.status(401);
+    throw new Error("Invalid token type");
+  }
+
+  req.user = await User.findById(decoded.id).select("-password -loginAttempts -lockUntil");
+  if (!req.user) {
+    res.status(401);
+    throw new Error("User no longer exists");
   }
 
   next();
