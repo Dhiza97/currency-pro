@@ -47,7 +47,7 @@ router.get("/google/callback",
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -57,7 +57,7 @@ router.get("/google/callback",
       name:  req.user.name,
       email: req.user.email,
     });
-    res.redirect(`${process.env.CLIENT_URL}/auth/callback#${params}`);
+    res.redirect(`${process.env.CLIENT_URL}/auth/callback#${params.toString()}`);
   }
 );
 
