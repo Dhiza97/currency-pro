@@ -2,11 +2,8 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
-  withCredentials: true, // send the httpOnly refresh cookie
 });
 
-// Attach access token from context to every request
-// (Set via setAccessTokenGetter below from AuthContext)
 let _getToken = () => null;
 let _refresh  = () => null;
 
@@ -17,7 +14,12 @@ export const setAuthHandlers = (getToken, refresh) => {
 
 API.interceptors.request.use((config) => {
   const token = _getToken();
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+    config.withCredentials = true;  // only send cookies when authenticated
+  } else {
+    config.withCredentials = false; // guest requests — no credentials
+  }
   return config;
 });
 
@@ -30,7 +32,6 @@ API.interceptors.response.use(
     const original = err.config;
     if (err.response?.status === 401 && !original._retry) {
       if (isRefreshing) {
-        // Queue requests while refresh is in flight
         return new Promise((resolve, reject) => {
           queue.push({ resolve, reject });
         }).then((token) => {
