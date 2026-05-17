@@ -30,7 +30,9 @@ API.interceptors.response.use(
   (res) => res,
   async (err) => {
     const original = err.config;
-    if (err.response?.status === 401 && !original._retry) {
+    const token = _getToken();
+
+    if (err.response?.status === 401 && !original._retry && token) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           queue.push({ resolve, reject });
