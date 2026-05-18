@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import AuthCallback from "./pages/AuthCallback";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
 
 function App() {
   const { getAccessToken, refreshAccessToken } = useContext(AuthContext);
@@ -28,6 +29,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
         </Routes>
       </BrowserRouter>
     </>
