@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import AuthCallback from "./pages/AuthCallback";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 function App() {
   const { getAccessToken, refreshAccessToken } = useContext(AuthContext);
@@ -26,6 +27,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
         </Routes>
       </BrowserRouter>
     </>
