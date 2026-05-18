@@ -14,13 +14,20 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!form.email || !form.password)
       return toast.error("Please fill all fields");
 
     try {
       setLoading(true);
+
       const { data } = await API.post("/auth/login", form);
-      login({ ...data.user, accessToken: data.accessToken });
+
+      login({
+        accessToken: data.accessToken,
+        user: data.user,
+      });
+
       toast.success("Welcome back!");
       navigate("/");
     } catch (error) {

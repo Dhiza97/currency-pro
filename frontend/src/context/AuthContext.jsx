@@ -9,9 +9,15 @@ export const AuthProvider = ({ children }) => {
   const accessTokenRef = useRef(null);
 
   const login = (data) => {
-    accessTokenRef.current = data.accessToken;
-    setUser(data.user);
-  };
+  accessTokenRef.current = data.accessToken;
+  setUser(data.user || {
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    preferredCurrency: data.preferredCurrency,
+    avatar: data.avatar,
+  });
+};
 
   const logout = async () => {
     await API.post("/auth/logout").catch(() => {});
