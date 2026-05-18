@@ -2,24 +2,24 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  withCredentials: true,
 });
 
 let _getToken = () => null;
-let _refresh  = () => null;
+let _refresh = () => null;
 
 export const setAuthHandlers = (getToken, refresh) => {
   _getToken = getToken;
-  _refresh  = refresh;
+  _refresh = refresh;
 };
 
 API.interceptors.request.use((config) => {
   const token = _getToken();
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    config.withCredentials = true;  // only send cookies when authenticated
-  } else {
-    config.withCredentials = false; // guest requests — no credentials
   }
+
   return config;
 });
 
@@ -36,8 +36,8 @@ API.interceptors.response.use(
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           queue.push({ resolve, reject });
-        }).then((token) => {
-          original.headers.Authorization = `Bearer ${token}`;
+        }).then((newToken) => {
+          original.headers.Authorization = `Bearer ${newToken}`;
           return API(original);
         });
       }
@@ -46,11 +46,13 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       const newToken = await _refresh();
+
       isRefreshing = false;
 
       if (newToken) {
         queue.forEach(({ resolve }) => resolve(newToken));
         queue = [];
+
         original.headers.Authorization = `Bearer ${newToken}`;
         return API(original);
       } else {
@@ -58,6 +60,7 @@ API.interceptors.response.use(
         queue = [];
       }
     }
+
     return Promise.reject(err);
   }
 );
