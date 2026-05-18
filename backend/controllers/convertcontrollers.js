@@ -32,7 +32,9 @@ export const convertCurrency = asyncHandler(async (req, res) => {
   const convertedAmount = Number((numericAmount * rate).toFixed(2));
 
   // Only save conversion if user is authenticated
-  if (req.user && req.user._id) {
+  const shouldSave = req.query.save === "true";
+
+  if (shouldSave && req.user?._id) {
     await Conversion.create({
       from: baseCurrency,
       to: targetCurrency,

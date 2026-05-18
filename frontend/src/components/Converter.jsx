@@ -53,16 +53,19 @@ export default function Converter({ selectedPair, reuseData }) {
 
       if (pairId) {
         res = await API.get(
-          `/convert/pair?pairId=${pairId}&amount=${form.amount}`,
+          `/convert/pair?pairId=${pairId}&amount=${form.amount}&save=true`,
         );
       } else {
         res = await API.get(
-          `/convert?from=${form.from}&to=${form.to}&amount=${form.amount}`,
+          `/convert?from=${form.from}&to=${form.to}&amount=${form.amount}&save=true`,
         );
       }
 
       setResult(res.data.data);
-      window.dispatchEvent(new Event("historyUpdated"));
+
+      if (user) {
+        window.dispatchEvent(new Event("historyUpdated"));
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Conversion failed");
     } finally {
@@ -105,7 +108,6 @@ export default function Converter({ selectedPair, reuseData }) {
 
   return (
     <div className="card p-4 sm:p-6 md:p-8 animate-fade-in">
-
       {/* Header */}
       <div className="flex items-center gap-2 mb-5 sm:mb-6">
         <BsCalculator className="text-gold-500 text-xl" />
@@ -131,7 +133,6 @@ export default function Converter({ selectedPair, reuseData }) {
 
       {/* Currency Selectors (RESPONSIVE FIX) */}
       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-3 mb-6">
-
         <div className="w-full">
           <CurrencySelect
             value={form.from}
@@ -160,7 +161,6 @@ export default function Converter({ selectedPair, reuseData }) {
 
       {/* Action Buttons (STACK ON MOBILE) */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
-
         <button
           className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 sm:py-2"
           onClick={handleConvert}
@@ -193,7 +193,6 @@ export default function Converter({ selectedPair, reuseData }) {
       {/* Result */}
       {result && (
         <div className="animate-slide-up">
-
           <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">
             You Receive
           </label>
@@ -217,7 +216,11 @@ export default function Converter({ selectedPair, reuseData }) {
         </div>
       )}
 
-      <RateChart key={`${form.from}-${form.to}`} from={form.from} to={form.to} />
+      <RateChart
+        key={`${form.from}-${form.to}`}
+        from={form.from}
+        to={form.to}
+      />
     </div>
   );
 }
